@@ -1,0 +1,17 @@
+# Δημοσίευση στο GitHub Pages. Χειροκίνητα προς το παρόν (Actions → pages → Run workflow);
+# όταν το repository γίνει public και ενεργοποιηθεί το Pages, προσθέστε και  push: { branches: [main] }
+name: pages
+on: { workflow_dispatch: {} }
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 build.py && mkdir -p site && cp dist/mastoras.html site/index.html && cp dist/mastoras.html site/
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: d
+        uses: actions/deploy-pages@v4
