@@ -1,7 +1,9 @@
-# Δημοσίευση στο GitHub Pages. Χειροκίνητα προς το παρόν (Actions → pages → Run workflow);
-# όταν το repository γίνει public και ενεργοποιηθεί το Pages, προσθέστε και  push: { branches: [main] }
+# Δημοσίευση στο GitHub Pages (https://kmanou.github.io/mastoras/) σε κάθε αλλαγή του main.
+# Απαιτεί Settings → Pages → Source: GitHub Actions.
 name: pages
-on: { workflow_dispatch: {} }
+on:
+  push: { branches: [main] }
+  workflow_dispatch: {}
 permissions: { contents: read, pages: write, id-token: write }
 concurrency: { group: pages, cancel-in-progress: true }
 jobs:
