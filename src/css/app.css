@@ -146,3 +146,54 @@ details.guide ul{padding-left:18px;margin-top:6px}
 .mt b{color:#FF6600}.gate-foot .mt b{color:#FF8A3D}
 .credit{display:flex;align-items:center;justify-content:center;gap:1.4mm;opacity:.6}
 .credit .mt-b{height:3.4mm;margin:0;vertical-align:0}
+
+/* ================= v3.1: languages, trades, receivables */
+.langsw{background:none;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85);border-radius:99px;padding:3px 10px;font:600 11.5px var(--font);cursor:pointer;margin-left:8px}
+.langsw:hover{background:rgba(255,255,255,.12)}
+.chip.lang{background:#EAF2FF;color:#2759B8;letter-spacing:.06em;font-size:10.5px}
+.chip.ticket{background:#E7F6EF;color:#1F7A4C}
+.langseg button{padding:5px 10px;font-size:12px}
+.biz{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+/* measurements on visits */
+.vtab tr.msr td{padding-top:0;border-bottom:1px solid #EEF2F7}
+.vtab tr:has(+tr.msr) td{border-bottom:0}
+.meas{display:flex;flex-wrap:wrap;gap:6px 10px;padding:2px 0 4px}
+.meas label{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
+.meas input{width:66px;font:500 12.5px var(--font);padding:5px 7px;border:1px solid var(--line);border-radius:7px}
+.meas select{font:500 12.5px var(--font);padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:#fff}
+.page .mtab tr.msr td{padding-top:0;font-size:7.6pt;color:#4B5B70;border-top:0}
+.page .mtab tr:has(+tr.msr) td{border-bottom-color:transparent}
+.page .mlbl{font-weight:700;color:var(--blue);margin-right:1mm}
+.page .mfill{display:inline-flex;align-items:flex-end;gap:1mm;margin-right:3mm;white-space:nowrap}
+.page .mfill i{display:inline-block;width:12mm;border-bottom:1px dotted #9FB0C4;height:3mm}
+/* optional lines */
+.page tr.optl td{color:#6B7A90}
+.page tr.optl .it-t{font-style:italic}
+.page .optb{display:block;font-size:6.8pt;color:var(--blue);font-weight:700;letter-spacing:.02em;margin-top:.6mm}
+/* receivables */
+.tile.hot b,.list td.hot{color:var(--bad)}
+.list tr.tot td{background:#F6F9FD;border-top:1.5px solid var(--line)}
+.list tr.sub2 td{background:#FBFCFE;font-size:12.5px;padding-top:8px;padding-bottom:8px}
+.list tr.sub2 td:first-child{padding-left:30px}
+/* settings */
+.cat-h,.cat-r{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 74px 80px 58px 32px}
+.kset-r .inp.en{color:#3B5B8A;background:#F8FBFF}
+.kset-h{gap:8px}.kset-h .gen{max-width:240px;padding:5px 9px;font-size:12.5px;margin-left:auto;background:#F8FBFF;color:#3B5B8A}
+.grid2x{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.regnote{background:#F1F6FC;border-radius:10px;padding:10px 14px;margin:0 0 14px!important;color:#3B4B60!important}
+/* repair intake receipt */
+.page.ticketp .tk-r{display:grid;grid-template-columns:44mm 1fr;gap:4mm;padding:2.6mm 0;border-bottom:1px solid var(--hair);font-size:9pt;line-height:1.5}
+.page.ticketp .tk-r .lbl{margin:0}
+.page.ticketp .terms ol{padding-left:4.5mm;font-size:8pt;color:#4B5B70;line-height:1.6}
+.cset .form textarea{min-height:60px}
+@media (max-width:1000px){ .grid2x{grid-template-columns:1fr} }
+.page .mtxt{display:block;font-size:7.2pt;color:#4B5B70;margin-top:.6mm;line-height:1.4}
+.page.visit .cs{margin-bottom:4.2mm}.page.visit .to{margin-bottom:5mm}.page.visit .hA{margin-bottom:5mm}
+.view p.vnote{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.55}
+.page.ticketp .mtab th:first-child{width:46mm!important}
+.page.ticketp .mtab td:first-child{padding-right:3mm}
+/* visit report: compact enough for a full A/C checklist with measurements on one A4 page */
+.page.visit .cs{margin-bottom:3.6mm}
+.page.visit .mtab td{padding-top:1.6mm;padding-bottom:1.6mm}
+.page.visit .kg{margin-bottom:1.6mm}.page.visit .kg li{padding:0;line-height:1.3}
+.page.visit .sign{margin-top:6mm}
