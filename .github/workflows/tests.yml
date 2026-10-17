@@ -13,5 +13,5 @@ jobs:
         shell: bash
         run: |
           pytest -q tests --tb=short -rf 2>&1 | tee pytest.log; st=${PIPESTATUS[0]}
-          grep -E '^(FAILED |E   )' pytest.log | head -30 | sed 's/^/::error::/' || true
+          if [ $st -ne 0 ]; then { grep -E '^(FAILED |ERROR |E   )' pytest.log | head -30; tail -n 12 pytest.log; } | sed 's/^/::error::/'; fi
           exit $st
