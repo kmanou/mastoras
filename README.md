@@ -18,15 +18,28 @@
 | **Πελατολόγιο** | έλεγχος ΑΦΜ, εξοπλισμός / μηχανήματα με εγγυήσεις |
 | **Συμβόλαια συντήρησης** | πρόγραμμα επισκέψεων, καταγραφή, δελτίο επίσκεψης (και κενό για το πεδίο) |
 | **Αρχική σελίδα** | ανεξόφλητα, προσφορές σε αναμονή, επισκέψεις του μήνα, συμβόλαια που λήγουν |
+| **Οφειλές** | υπόλοιπο ανά πελάτη με ηλικία (0–30 / 31–60 / 61–90 / 90+), υπενθύμιση με email |
+| **Ελληνικά & αγγλικά** | εφαρμογή και έγγραφα σε δύο γλώσσες, ανεξάρτητα: ελληνική εφαρμογή, αγγλική προσφορά για ξένο πελάτη |
+| **Πρότυπα & κατάλογος** | έτοιμα πακέτα γραμμών, μαζική αλλαγή τιμών %, εισαγωγή/εξαγωγή CSV |
+| **Ημερολόγιο** | επισκέψεις και έλεγχοι σε .ics για Google Calendar / Outlook |
 | **Ασφάλεια δεδομένων** | ημερήσια αντίγραφα, επαναφορά, ακύρωση αντί για διαγραφή, εξαγωγή CSV για Excel |
 
-Υπάρχουν δύο προφίλ: **ψύξη & κλιματισμός** (μηχανήματα με μάρκα/BTU) και **γενική επιχείρηση**.
+### Είδη επιχείρησης
+| | Εξοπλισμός | Ειδικά |
+|---|---|---|
+| **Ψύξη & κλιματισμός** | κλιματιστικά, ψυκτικά με BTU, ψυκτικό, γόμωση | **μητρώο F-gas**: t CO₂e και συχνότητα ελέγχου διαρροών (Κανονισμός ΕΕ 2024/573) |
+| **Υδραυλικός · θέρμανση** | λέβητες, καυστήρες, θερμοσίφωνες, ηλιακοί, αντλίες | **έλεγχοι καύσης** στην επίσκεψη, υπενθύμιση ετήσιου ελέγχου |
+| **Ηλεκτρολόγος** | πίνακες, γειώσεις, Η/Ζ, φωτοβολταϊκά, φορτιστές | **μετρήσεις** γείωσης/ρελέ/μόνωσης, ΥΔΕ και επανέλεγχοι |
+| **Τεχνικός Η/Υ & δικτύων** | υπολογιστές, εκτυπωτές, δίκτυο, NAS | **δελτία παραλαβής για επισκευή**, έλεγχος υγείας, ώρες υποστήριξης |
+| **Γενική επιχείρηση** | ελεύθερος εξοπλισμός | — |
 
-<p align="center"><img src="docs/screenshots/4-proforma.png" alt="Προτιμολόγιο με πληρωμές" width="49%"> <img src="docs/screenshots/6-visit.png" alt="Δελτίο επίσκεψης" width="49%"></p>
+<p align="center"><img src="docs/screenshots/4-proforma.png" alt="Προτιμολόγιο με πληρωμές" width="49%"> <img src="docs/screenshots/8-visit-measurements.png" alt="Δελτίο επίσκεψης με μετρήσεις" width="49%"></p>
+<p align="center"><img src="docs/screenshots/7-english.png" alt="Αγγλική προσφορά" width="49%"> <img src="docs/screenshots/9-repair-to-proforma.png" alt="Από επισκευή σε προτιμολόγιο" width="49%"></p>
 
 ## Δοκιμάστε το
 - **Online:** https://kmanou.github.io/mastoras/ — ανοίγει κατευθείαν σε Chrome/Edge· σας ζητά έναν φάκελο του υπολογιστή σας για τα δεδομένα.
 - **Γρήγορη δοκιμή χωρίς φάκελο:** https://kmanou.github.io/mastoras/?opfs=1 — φορτώστε στο τέλος του οδηγού τα δεδομένα επίδειξης.
+- **In English:** https://kmanou.github.io/mastoras/?opfs=1&lang=en
 
 Και στις δύο περιπτώσεις τα δεδομένα μένουν μόνο στον υπολογιστή σας· η σελίδα δεν στέλνει τίποτα πουθενά.
 
@@ -44,7 +57,8 @@
 
 ## Για προγραμματιστές
 ```
-src/js/      κώδικας (core → brand/shell → documents → contracts/settings)
+src/js/      κώδικας: 0-i18n (γλώσσες) → core → brand/shell → documents → contracts/settings
+             → profiles (είδη επιχείρησης) → extras (οφειλές, πρότυπα, .ics, έλεγχοι, επισκευές) → boot
 src/css/     base.css (κέλυφος, A4 έγγραφο) + app.css
 src/fonts/   Manrope (SIL OFL 1.1)
 build.py     χτίζει το dist/mastoras.html (μόνο Python 3)
@@ -70,6 +84,6 @@ pytest -q tests                 # SHOTS=1 για στιγμιότυπα στο d
 
 ---
 
-**English:** *Mastoras* is a free, single-file web app (Greek UI) for small trade businesses: quotes, pro-forma invoices, maintenance contracts with visit sheets, payments and a client book. Data stays in a local folder via the File System Access API (Chrome/Edge desktop). Licensed under GPL-3.0 with a §7(b) attribution term and a §7(e) trademark term.
+**English:** *Mastoras* is a free, single-file web app (Greek and English interface) for small trade businesses: quotations, proforma invoices, maintenance agreements with visit reports, payments, receivables and a client book. Documents can be issued in Greek or English. Trade profiles for HVAC (F-gas register), plumbing & heating (combustion checks), electricians (measurements, re-inspections) and IT services (repair tickets). Data stays in a local folder via the File System Access API (Chrome/Edge desktop). Licensed under GPL-3.0 with a §7(b) attribution term and a §7(e) trademark term.
 
 © 2026 Κωνσταντίνος Μανούσης · [MakeTech](https://maketech.eu)

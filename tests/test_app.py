@@ -127,3 +127,88 @@ def test_print_pages(page, tmp_path):
     pg.click("[data-go=contracts]"); pg.wait_for_timeout(400); pg.locator("#rows tr.click").last.click(); pg.wait_for_timeout(900)
     pg.locator("[data-vsheet]").first.click(); pg.wait_for_timeout(800)
     assert pages() == 1
+
+# ------------------------------------------------------------------ 3.1: languages, trades, receivables
+def test_english_ui_and_documents(page, tmp_path):
+    pg = page
+    pg.goto(pg.base + "?opfs=1&reset=1&lang=en"); pg.wait_for_timeout(1200)
+    assert "Business details" in txt(pg, ".setup")
+    setup(pg, demo=True)
+    assert "Needs attention" in txt(pg, ".view") and "Receivables" in txt(pg, ".tabs")
+    # the English quotation of the demo client from abroad: English texts, English formats, transliterated issuer
+    pg.click("[data-go=docs]"); pg.wait_for_timeout(400); pg.locator("#rows tr.click", has_text="Aegean").first.click(); pg.wait_for_timeout(900)
+    p = txt(pg, "#page"); P = p.upper()
+    assert "QUOTATION" in P and "TOTAL INCL. VAT" in P and "€" in p and "This document is not a tax invoice." in p
+    assert "Psyktiki Dokimi IKE" in p and "pcs" in p
+    shot(pg, "7-english.png")
+    # a Greek draft switched to English
+    pg.click("[data-go=clients]"); pg.wait_for_timeout(400); pg.locator("#rows tr.click", has_text="Παπαδάκη").first.click(); pg.wait_for_timeout(500)
+    pg.click("#b-no"); pg.wait_for_timeout(600)
+    assert "ΠΡΟΣΦΟΡΑ" in txt(pg, "#page .eb")
+    pg.click("[data-dl=en]"); pg.wait_for_timeout(500)
+    assert "QUOTATION" in txt(pg, "#page .eb").upper() and "VALID UNTIL" in txt(pg, "#page .hA-r").upper()
+    # the email text follows the document language
+    pg.click("#b-opt"); pg.click("#o-mail"); pg.wait_for_timeout(300)
+    assert "Please find attached" in pg.input_value("#em-b"); pg.keyboard.press("Escape")
+
+def test_templates_catalog_and_tools(page, tmp_path):
+    pg = page
+    setup(pg, demo=True)
+    pg.click("[data-go=docs]"); pg.wait_for_timeout(400); pg.locator("#rows tr.click", has_text="Μερική").first.click(); pg.wait_for_timeout(800)
+    pg.click("#b-opt"); pg.click("#o-tpl"); pg.wait_for_timeout(300); pg.fill("#pb-v", "Πακέτο συντήρησης"); pg.click(".md footer >> text=Αποθήκευση"); pg.wait_for_timeout(900)
+    assert pg.evaluate("DB.settings.templates.length") == 1
+    pg.click("#b-new"); pg.click("[data-new=tpl]"); pg.wait_for_timeout(300); pg.locator("#tp button").first.click(); pg.wait_for_timeout(800)
+    assert pg.locator("#items tr").count() == 3 and "Πρόχειρο" in txt(pg, ".subbar .dt")
+    # copy for another client
+    pg.click("#b-opt"); pg.click("#o-dupc"); pg.wait_for_timeout(300); pg.locator("#pk button", has_text="Σταθόπουλος").first.click(); pg.wait_for_timeout(800)
+    assert "Σταθόπουλος" in txt(pg, ".to .nm2")
+    # catalogue: +10% rounded to 0.50, then CSV import with an English column
+    pg.click("[data-go=settings]"); pg.wait_for_timeout(600)
+    before = pg.evaluate("DB.settings.catalog.map(x=>x.p)")
+    pg.click("#cat-pct"); pg.fill("#bp-pct", "10"); pg.click(".md footer >> text=Εφαρμογή"); pg.wait_for_timeout(400)
+    after = pg.evaluate("DB.settings.catalog.map(x=>x.p)")
+    assert all(abs(a - round(b * 1.1 * 2) / 2) < 0.001 for a, b in zip(after, before))
+    f = tmp_path / "cat.csv"; f.write_text("Περιγραφή;Περιγραφή EN;Μονάδα;Τιμή;ΦΠΑ\nΑλλαγή φίλτρου;Filter change;τεμ.;12,50;24\n", encoding="utf-8")
+    pg.set_input_files("#cat-imp", str(f)); pg.wait_for_timeout(500); pg.click(".md footer >> text=Εισαγωγή"); pg.wait_for_timeout(900)
+    assert pg.evaluate("DB.settings.catalog.some(x=>x.t==='Αλλαγή φίλτρου' && x.te==='Filter change' && x.p===12.5 && x.vat===24)")
+    # receivables with ageing, CSV and calendar
+    pg.click("[data-go=debts]"); pg.wait_for_timeout(500)
+    assert "61–90" in txt(pg, ".view") and pg.locator("#rows tr[data-i]").count() >= 2
+    with pg.expect_download() as dl: pg.click("#b-csv")
+    assert dl.value.suggested_filename.endswith(".csv")
+    pg.click("[data-go=contracts]"); pg.wait_for_timeout(400)
+    with pg.expect_download() as dl: pg.click("#b-ics")
+    ics = open(dl.value.path(), "rb").read().decode("utf-8")
+    assert ics.startswith("BEGIN:VCALENDAR") and "BEGIN:VEVENT" in ics and "\r\n" in ics
+
+@pytest.mark.parametrize("biz,tab,cell", [("hvac", "F-gas", "R410A"), ("plumb", "Έλεγχοι καύσης", "Πετρέλαιο"), ("elec", "Μετρήσεις", "Γενικός πίνακας")])
+def test_trades_register_and_measurements(page, biz, tab, cell):
+    pg = page
+    setup(pg, demo=True, biz=biz)
+    assert tab in txt(pg, ".tabs")
+    pg.click("[data-go=reg]"); pg.wait_for_timeout(500)
+    assert cell in txt(pg, "#rows") and pg.locator("#rows .chip.warn, #rows .chip.bad").count() >= 1
+    # record measurements on a visit; they reach the visit report and the register
+    pg.click("[data-go=contracts]"); pg.wait_for_timeout(400); pg.locator("#rows tr.click").last.click(); pg.wait_for_timeout(900)
+    pg.click("#v-new"); pg.wait_for_timeout(400)
+    first = pg.locator("[data-ms]").first
+    if first.evaluate("e=>e.tagName") == "SELECT": first.select_option(index=1)
+    else: first.fill("7")
+    pg.click(".md footer >> text=Αποθήκευση & δελτίο"); pg.wait_for_timeout(900)
+    assert "Μετρήσεις" in txt(pg, "#page")
+    if biz == "hvac": shot(pg, "8-visit-measurements.png")
+
+def test_it_repair_ticket(page):
+    pg = page
+    setup(pg, demo=True, biz="it")
+    pg.click("[data-go=reg]"); pg.wait_for_timeout(500)
+    assert pg.locator("#rows tr.click").count() == 2
+    pg.click("#b-nt"); pg.wait_for_timeout(300); pg.locator("#pk button").first.click(); pg.wait_for_timeout(700)
+    pg.select_option("#tk-kind", "Φορητός υπολογιστής"); pg.fill("#tk-brand", "Lenovo"); pg.fill("#tk-fault", "Σπασμένη οθόνη"); pg.fill("#tk-est", "150"); pg.wait_for_timeout(300)
+    assert "Σπασμένη οθόνη" in txt(pg, "#page")
+    pg.click("#b-pdf"); pg.wait_for_timeout(300); pg.click(".md footer >> text=Έκδοση & PDF"); pg.wait_for_timeout(1500)
+    assert "ΕΠ-" in txt(pg, ".subbar .dt")
+    pg.click("[data-ts=ready]"); pg.wait_for_timeout(500)
+    pg.fill("#tk-cost", "124"); pg.wait_for_timeout(300); pg.click("#b-tp"); pg.wait_for_timeout(900)
+    assert "100,00" in txt(pg, "#items")  # 124 incl. 24% VAT → 100 net
+    shot(pg, "9-repair-to-proforma.png")
