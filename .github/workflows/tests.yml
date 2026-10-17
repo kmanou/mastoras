@@ -12,6 +12,7 @@ jobs:
       - name: pytest (failures are shown as annotations on the pull request)
         shell: bash
         run: |
+          set +e
           pytest -q tests --tb=short -rf 2>&1 | tee pytest.log; st=${PIPESTATUS[0]}
           if [ $st -ne 0 ]; then { grep -E '^(FAILED |ERROR |E   )' pytest.log | head -30; tail -n 12 pytest.log; } | sed 's/^/::error::/'; fi
           exit $st
